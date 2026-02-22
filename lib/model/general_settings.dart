@@ -27,7 +27,9 @@ const defaultNoteHorizontalPadding = 12.0;
 const maxNoteHorizontalPadding = 36.0;
 const minEmojiPickerScale = 0.1;
 const maxEmojiPickerScale = 3.0;
+// Customization: Added chat button as first item for "私聊放第一屏"
 const defaultTimelinesPageButtonTypes = [
+  TimelinesPageButtonType.chat,
   TimelinesPageButtonType.menu,
   TimelinesPageButtonType.home,
   TimelinesPageButtonType.notifications,

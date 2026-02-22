@@ -19,15 +19,16 @@ import '../../provider/server_url_notifier_provider.dart';
 import '../../util/future_with_dialog.dart';
 import '../../util/launch_url.dart';
 import '../../util/punycode.dart';
-import '../dialog/misskey_server_list_dialog.dart';
 import '../widget/image_widget.dart';
-import '../widget/misskey_server_autocomplete.dart';
 import '../widget/misskey_server_background.dart';
 
 class LoginPage extends HookConsumerWidget {
   const LoginPage({super.key, this.query});
 
   final String? query;
+
+  // Customization: Force server domain
+  static const String _forcedServerDomain = 'misskey.liminalselves.top';
 
   Future<void> _launchMiAuth(
     WidgetRef ref,
@@ -115,15 +116,12 @@ class LoginPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Customization: Force server domain, ignore query parameter
     final servers = ref.watch(misskeyServersProvider).value ?? [];
-    final controller = useTextEditingController(text: this.query);
+    final controller = useTextEditingController(text: _forcedServerDomain);
     final focusNode = useFocusNode();
-    final query = useState(this.query ?? '');
-    final host = query.value
-        .trim()
-        .replaceFirst(RegExp('https?://'), '')
-        .split('/')
-        .first;
+    final query = useState(_forcedServerDomain);
+    final host = _forcedServerDomain;
     final server = servers.firstWhereOrNull((server) => server.url == host);
     final iconUrl =
         server?.meta?['iconUrl'] as String? ??
@@ -193,35 +191,19 @@ class LoginPage extends HookConsumerWidget {
                                 : const SizedBox.square(dimension: 50.0),
                           ),
                           const SizedBox(height: 16.0),
-                          MisskeyServerAutocomplete(
+                          // Customization: Server input is read-only with forced domain
+                          TextField(
                             controller: controller,
                             focusNode: focusNode,
-                            autofocus: true,
-                            onSubmitted: (host) => futureWithDialog(
-                              context,
-                              _launchMiAuth(ref, host),
+                            decoration: InputDecoration(
+                              hintText: t.misskey.instance,
+                              border: const OutlineInputBorder(),
+                              filled: true,
+                              fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                             ),
+                            readOnly: true,
                           ),
-                          Align(
-                            alignment: AlignmentDirectional.centerStart,
-                            child: TextButton(
-                              style: TextButton.styleFrom(
-                                minimumSize: Size.zero,
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              ),
-                              onPressed: () async {
-                                final server = await showDialog<String>(
-                                  context: context,
-                                  builder: (context) =>
-                                      const MisskeyServerListDialog(),
-                                );
-                                if (server != null) {
-                                  controller.text = server;
-                                }
-                              },
-                              child: Text(t.aria.findServer),
-                            ),
-                          ),
+                          // Customization: Removed "Find Server" button
                           const SizedBox(height: 16.0),
                           ElevatedButton.icon(
                             onPressed: query.value.isNotEmpty
