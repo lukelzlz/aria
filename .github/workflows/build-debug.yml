@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - "v*-custom"
   workflow_dispatch:
 
 jobs:
@@ -103,3 +105,14 @@ jobs:
             ${{ env.APK_BUILD_DIR }}/build/app/outputs/apk/debug/aria-debug-armeabi-v7a.apk
             ${{ env.APK_BUILD_DIR }}/build/app/outputs/apk/debug/aria-debug-arm64-v8a.apk
             ${{ env.APK_BUILD_DIR }}/build/app/outputs/apk/debug/aria-debug-x86_64.apk
+
+      - name: Release APK
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ${{ env.APK_BUILD_DIR }}/build/app/outputs/apk/debug/aria-debug-armeabi-v7a.apk
+            ${{ env.APK_BUILD_DIR }}/build/app/outputs/apk/debug/aria-debug-arm64-v8a.apk
+            ${{ env.APK_BUILD_DIR }}/build/app/outputs/apk/debug/aria-debug-x86_64.apk
+          draft: false
+          prerelease: true
