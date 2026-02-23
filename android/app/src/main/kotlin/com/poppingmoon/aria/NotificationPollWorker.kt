@@ -3,10 +3,6 @@ package com.poppingmoon.aria
 import android.content.Context
 import android.util.Log
 import androidx.work.*
-import io.flutter.embedding.engine.FlutterEngine
-import io.flutter.embedding.engine.FlutterEngineCache
-import io.flutter.embedding.engine.dart.DartExecutor
-import io.flutter.plugin.common.MethodChannel
 import java.util.concurrent.TimeUnit
 
 class NotificationPollWorker(
@@ -17,7 +13,6 @@ class NotificationPollWorker(
     companion object {
         const val TAG = "NotificationPollWorker"
         const val WORK_NAME = "aria_notification_poll"
-        const val CHANNEL = "com.poppingmoon.aria/push"
 
         fun schedule(context: Context, intervalMinutes: Long = 15) {
             val workRequest = PeriodicWorkRequestBuilder<NotificationPollWorker>(
@@ -50,12 +45,18 @@ class NotificationPollWorker(
         }
 
         fun isScheduled(context: Context): Boolean {
-            val workInfos = WorkManager.getInstance(context)
-                .getWorkInfosForUniqueWork(WORK_NAME)
-                .get()
-            return workInfos.any { 
-                it.state == WorkInfo.State.RUNNING || 
-                it.state == WorkInfo.State.ENQUEUED 
+            // Use synchronous get with timeout
+            return try {
+                val workInfos = WorkManager.getInstance(context)
+                    .getWorkInfosForUniqueWork(WORK_NAME)
+                    .get(5, TimeUnit.SECONDS)
+                workInfos.any { 
+                    it.state == WorkInfo.State.RUNNING || 
+                    it.state == WorkInfo.State.ENQUEUED 
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error checking work status", e)
+                false
             }
         }
     }
@@ -63,17 +64,15 @@ class NotificationPollWorker(
     override fun doWork(): Result {
         Log.d(TAG, "Polling for notifications...")
         
-        try {
+        return try {
             // Send broadcast to Flutter to check notifications
-            // Flutter side will handle the actual API call
             val intent = android.content.Intent("com.poppingmoon.aria.POLL_NOTIFICATIONS")
             intent.setPackage(applicationContext.packageName)
             applicationContext.sendBroadcast(intent)
-            
-            return Result.success()
+            Result.success()
         } catch (e: Exception) {
             Log.e(TAG, "Error polling notifications", e)
-            return Result.retry()
+            Result.retry()
         }
     }
 }

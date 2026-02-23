@@ -62,6 +62,7 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
     implementation("org.unifiedpush.android:embedded-fcm-distributor:3.0.0")
     implementation("androidx.work:work-runtime-ktx:2.9.1")
+    implementation("com.google.guava:guava:33.0.0-android")
 }
 
 configurations.all {
