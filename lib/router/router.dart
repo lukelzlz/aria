@@ -90,12 +90,17 @@ import '../view/page/user/followers_page.dart';
 import '../view/page/user/following_page.dart';
 import '../view/page/user/user_list_page.dart';
 import '../view/page/user/user_page.dart';
+import '../view/page/onboarding_page.dart';
+import '../view/page/webview_login_page.dart';
+import '../view/page/webview_register_page.dart';
+import '../provider/accounts_notifier_provider.dart';
 
 part 'router.g.dart';
 
 @riverpod
 GoRouter router(Ref ref) {
   final bootState = ref.watch(bootStateProvider);
+  final accounts = ref.watch(accountsNotifierProvider);
   final sharedFiles =
       defaultTargetPlatform == TargetPlatform.android ||
           defaultTargetPlatform == TargetPlatform.iOS
@@ -112,6 +117,8 @@ GoRouter router(Ref ref) {
         redirect: (_, _) {
           if (!bootState.hasValue || bootState.value == null) {
             return null;
+          } else if (accounts.isEmpty) {
+            return '/onboarding';
           } else {
             return '/timelines';
           }
@@ -121,6 +128,26 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: '/about-misskey',
         builder: (_, _) => const AboutMisskeyPage(),
+      ),
+      // Onboarding routes
+      GoRoute(
+        path: '/onboarding',
+        builder: (_, _) => const OnboardingPage(),
+        routes: [
+          GoRoute(
+            path: 'login',
+            builder: (_, _) => const WebViewLoginPage(),
+          ),
+          GoRoute(
+            path: 'register',
+            builder: (_, _) => const WebViewRegisterPage(),
+          ),
+          GoRoute(
+            path: 'token',
+            builder: (_, state) =>
+                TokenLoginPage(query: state.uri.queryParameters['query']),
+          ),
+        ],
       ),
       GoRoute(
         path: '/login',
