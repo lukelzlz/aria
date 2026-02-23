@@ -346,7 +346,8 @@ class TabSettingsPage extends HookConsumerWidget {
                             TabType.antenna ||
                             TabType.mention ||
                             TabType.direct ||
-                            TabType.notifications =>
+                            TabType.notifications ||
+                            TabType.chat =>
                               !(account.value?.isGuest ?? true),
                             TabType.localTimeline =>
                               account.value?.isGuest ?? true

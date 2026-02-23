@@ -93,6 +93,10 @@ abstract class TabSettings with _$TabSettings {
     return TabSettings(tabType: TabType.direct, account: account);
   }
 
+  factory TabSettings.chat(Account account) {
+    return TabSettings(tabType: TabType.chat, account: account);
+  }
+
   factory TabSettings.user(Account account, String userId) {
     return TabSettings(tabType: TabType.user, account: account, userId: userId);
   }

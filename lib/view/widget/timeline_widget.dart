@@ -48,14 +48,16 @@ class TimelineWidget extends HookConsumerWidget {
             (settings.vibrateNotification, settings.showTimelineLastViewedAt),
       ),
     );
-    final lastViewedNoteId = tabSettings.tabType != TabType.notifications
+    final lastViewedNoteId = tabSettings.tabType != TabType.notifications &&
+            tabSettings.tabType != TabType.chat
         ? ref.watch(timelineLastViewedNoteIdNotifierProvider(tabSettings))
         : null;
     final lastViewedAt = lastViewedNoteId != null
         ? ref.watch(timelineLastViewedAtProvider(tabSettings))
         : null;
     final centerId = ref.watch(timelineCenterNotifierProvider(tabSettings));
-    final nextNoteId = tabSettings.tabType != TabType.notifications
+    final nextNoteId = tabSettings.tabType != TabType.notifications &&
+            tabSettings.tabType != TabType.chat
         ? ref.watch(
             timelineNotesAfterNoteNotifierProvider(
               tabSettings,
@@ -63,7 +65,8 @@ class TimelineWidget extends HookConsumerWidget {
             ).select((notes) => notes.value?.items.firstOrNull?.id),
           )
         : null;
-    final previousNoteId = tabSettings.tabType != TabType.notifications
+    final previousNoteId = tabSettings.tabType != TabType.notifications &&
+            tabSettings.tabType != TabType.chat
         ? ref.watch(
             timelineNotesNotifierProvider(
               tabSettings,

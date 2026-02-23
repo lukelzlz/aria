@@ -18,6 +18,7 @@ import '../../provider/general_settings_notifier_provider.dart';
 import '../../provider/streaming/timeline_stream_provider.dart';
 import '../../provider/streaming/web_socket_channel_provider.dart';
 import '../../provider/timeline_center_notifier_provider.dart';
+import '../page/chat/chat_home.dart';
 import '../../provider/timeline_last_viewed_note_id_notifier_provider.dart';
 import '../../provider/timeline_scroll_controller_provider.dart';
 import '../../util/reload_timeline.dart';
@@ -119,6 +120,9 @@ class TimelineListView extends HookConsumerWidget {
         account: tabSettings.account,
         controller: controller,
       );
+    }
+    if (tabSettings.tabType == TabType.chat) {
+      return ChatHome(account: tabSettings.account);
     }
     final lastViewedNoteId = ref.watch(
       timelineLastViewedNoteIdNotifierProvider(tabSettings),

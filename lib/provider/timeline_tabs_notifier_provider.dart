@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
+import '../model/tab_icon.dart';
 import '../model/tab_settings.dart';
 import '../model/tab_type.dart';
+import 'accounts_notifier_provider.dart';
 import 'shared_preferences_provider.dart';
 
 part 'timeline_tabs_notifier_provider.g.dart';
@@ -23,8 +25,30 @@ class TimelineTabsNotifier extends _$TimelineTabsNotifier {
           tabs.add(TabSettings.fromJson(json));
         } catch (_) {}
       }
+      // Auto-create chat tab for first account if no tabs exist but account exists
+      if (tabs.isEmpty) {
+        final accounts = ref.watch(accountsNotifierProvider);
+        if (accounts.isNotEmpty) {
+          final chatTab = TabSettings.chat(accounts.first).copyWith(
+            id: const Uuid().v4(),
+            icon: const MaterialIcon(codePoint: 0xe0b7), // Icons.chat
+          );
+          Future.microtask(() => state = [chatTab]);
+          return [chatTab];
+        }
+      }
       return tabs;
     } else {
+      // Auto-create chat tab for first account if no tabs exist but account exists
+      final accounts = ref.watch(accountsNotifierProvider);
+      if (accounts.isNotEmpty) {
+        final chatTab = TabSettings.chat(accounts.first).copyWith(
+          id: const Uuid().v4(),
+          icon: const MaterialIcon(codePoint: 0xe0b7), // Icons.chat
+        );
+        Future.microtask(() => _save());
+        return [chatTab];
+      }
       return [];
     }
   }
