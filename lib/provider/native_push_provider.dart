@@ -4,8 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../provider/api/notifications_notifier_provider.dart';
-import '../provider/shared_preferences_provider.dart';
+import 'accounts_notifier_provider.dart';
+import 'shared_preferences_provider.dart';
+import 'streaming/main_stream_provider.dart';
 
 part 'native_push_provider.g.dart';
 
@@ -42,7 +43,7 @@ class NativePushService extends _$NativePushService {
     );
 
     // Apply settings on Android (including first-time defaults)
-    if (Platform.isAndroid && !kDebugMode) {
+    if (Platform.isAndroid) {
       if (keepAlive) {
         await startKeepAlive();
       }
@@ -71,10 +72,15 @@ class NativePushService extends _$NativePushService {
 
   Future<void> _checkNotifications() async {
     try {
-      // This will trigger notification check via the existing provider
-      await ref.read(notificationsNotifierProvider(null).notifier).refresh();
+      // Reconnect all accounts' main stream to ensure connection is alive
+      final accounts = ref.read(accountsNotifierProvider);
+      for (final account in accounts) {
+        // Invalidate main stream to trigger reconnection
+        ref.invalidate(mainStreamProvider(account));
+      }
+      debugPrint('Poll: Refreshed connections for ${accounts.length} accounts');
     } catch (e) {
-      debugPrint('Error checking notifications: $e');
+      debugPrint('Error in poll check: $e');
     }
   }
 
