@@ -122,6 +122,7 @@ class TimelineHeader extends HookConsumerWidget {
                       TabType.direct => t.misskey.directNotes,
                       TabType.user => t.misskey.user,
                       TabType.notifications => t.misskey.notifications,
+                      TabType.chat => t.misskey.chat,
                       TabType.custom => t.aria.custom,
                     },
               ),

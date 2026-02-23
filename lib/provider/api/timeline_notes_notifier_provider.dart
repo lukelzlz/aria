@@ -155,6 +155,9 @@ class TimelineNotesNotifier extends _$TimelineNotesNotifier {
       TabType.notifications => throw UnsupportedError(
         '_fetchNote() for TabType.notifications is not supported',
       ),
+      TabType.chat => throw UnsupportedError(
+        '_fetchNote() for TabType.chat is not supported',
+      ),
       TabType.custom => _fetchNotesFromCustomTimeline(untilId: untilId),
     };
     ref.read(notesNotifierProvider(tabSettings.account).notifier).addAll(notes);

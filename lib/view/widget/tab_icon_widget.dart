@@ -42,6 +42,7 @@ class TabIconWidget extends StatelessWidget {
         TabType.direct => Icons.mail,
         TabType.user => Icons.person,
         TabType.notifications => Icons.notifications,
+        TabType.chat => Icons.chat,
         TabType.custom => Icons.tune,
       }, size: size),
     };

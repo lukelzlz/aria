@@ -69,7 +69,8 @@ FutureOr<String> _timelineStreamConnection(
     case TabType.mention ||
         TabType.direct ||
         TabType.user ||
-        TabType.notifications:
+        TabType.notifications ||
+        TabType.chat:
       break;
     case TabType.custom:
       if (tabSettings case TabSettings(:final streamingChannel?)) {
@@ -153,7 +154,7 @@ Stream<Note> timelineStream(Ref ref, TabSettings tabSettings) async* {
           }
         }
       });
-    case TabType.user || TabType.notifications:
+    case TabType.user || TabType.notifications || TabType.chat:
   }
   yield* controller.stream;
 }
