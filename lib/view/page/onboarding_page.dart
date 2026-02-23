@@ -26,22 +26,7 @@ class OnboardingPage extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               Text(
-                t.misskey.welcome,
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Liminalselves',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                ),
-              ),
-              const SizedBox(height: 32),
-              // Description
-              Text(
-                t.misskey.aboutMisskey,
+                t.misskey.introMisskey,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
