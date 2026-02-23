@@ -27,8 +27,12 @@ class NativePushService extends _$NativePushService {
 
   Future<void> _loadState() async {
     final prefs = ref.read(sharedPreferencesProvider);
-    final keepAlive = prefs.getBool(_keyKeepAlive) ?? false;
-    final polling = prefs.getBool(_keyPolling) ?? false;
+    // Default to true for first-time users (China push optimization)
+    final hasKeepAliveKey = prefs.containsKey(_keyKeepAlive);
+    final hasPollingKey = prefs.containsKey(_keyPolling);
+    
+    final keepAlive = hasKeepAliveKey ? prefs.getBool(_keyKeepAlive)! : true;
+    final polling = hasPollingKey ? prefs.getBool(_keyPolling)! : true;
     final interval = prefs.getInt(_keyPollingInterval) ?? 15;
 
     state = state.copyWith(
@@ -37,13 +41,20 @@ class NativePushService extends _$NativePushService {
       pollingIntervalMinutes: interval,
     );
 
-    // Apply saved settings on Android
+    // Apply settings on Android (including first-time defaults)
     if (Platform.isAndroid && !kDebugMode) {
       if (keepAlive) {
         await startKeepAlive();
       }
       if (polling) {
         await startPolling(intervalMinutes: interval);
+      }
+      // Save defaults if first time
+      if (!hasKeepAliveKey) {
+        await prefs.setBool(_keyKeepAlive, true);
+      }
+      if (!hasPollingKey) {
+        await prefs.setBool(_keyPolling, true);
       }
     }
   }
@@ -164,8 +175,8 @@ class NativePushState {
   final int pollingIntervalMinutes;
 
   const NativePushState({
-    this.keepAliveEnabled = false,
-    this.pollingEnabled = false,
+    this.keepAliveEnabled = true, // Default ON for China users
+    this.pollingEnabled = true, // Default ON for China users
     this.pollingIntervalMinutes = 15,
   });
 
