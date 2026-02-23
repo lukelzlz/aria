@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ import '../../../model/account.dart';
 import '../../../provider/api/i_notifier_provider.dart';
 import '../../../provider/api/meta_notifier_provider.dart';
 import '../../../provider/apns_push_connector_provider.dart';
+import '../../../provider/native_push_provider.dart';
 import '../../../provider/push_subscription_notifier_provider.dart';
 import '../../../provider/unified_push_endpoint_notifier_provider.dart';
 import '../../../provider/user_ids_notifier_provider.dart';
@@ -248,6 +250,52 @@ class NotificationsSettingsPage extends ConsumerWidget {
               ),
             ),
           ),
+          // China Android push optimization
+          if (Platform.isAndroid) ...[
+            const SizedBox(height: 16.0),
+            Center(
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                width: maxContentWidth,
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  '国内推送优化',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8.0),
+            Center(
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                width: maxContentWidth,
+                child: Card(
+                  margin: EdgeInsets.zero,
+                  child: Column(
+                    children: [
+                      SwitchListTile(
+                        title: const Text('前台服务'),
+                        subtitle: const Text('保持 WebSocket 连接，实时接收消息'),
+                        value: ref.watch(nativePushServiceProvider).keepAliveEnabled,
+                        onChanged: (value) {
+                          ref.read(nativePushServiceProvider.notifier).toggleKeepAlive(value);
+                        },
+                      ),
+                      const Divider(height: 1),
+                      SwitchListTile(
+                        title: const Text('定时轮询'),
+                        subtitle: const Text('每 15 分钟检查一次新消息（保底）'),
+                        value: ref.watch(nativePushServiceProvider).pollingEnabled,
+                        onChanged: (value) {
+                          ref.read(nativePushServiceProvider.notifier).togglePolling(value);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
       selectedDestination: AccountSettingsDestination.notifications,
